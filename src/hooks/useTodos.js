@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 
-const API_BASE_URL = 'http://localhost:3000/api/todos'
+const API_BASE_URL = 'http://localhost:3000/todos'
 
 export function useTodos() {
   const [todos, setTodos] = useState([])
@@ -62,7 +62,7 @@ export function useTodos() {
     try {
       setError(null)
       const response = await fetch(`${API_BASE_URL}/${id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
