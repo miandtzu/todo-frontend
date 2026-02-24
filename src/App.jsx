@@ -1,38 +1,46 @@
-import { useTodos } from './hooks/useTodos'
-import { TodoForm } from './components/TodoForm'
-import { TodoList } from './components/TodoList'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card'
-import { CheckSquare2 } from 'lucide-react'
+import { useTodos } from "./hooks/useTodos";
+import { TodoForm } from "./components/TodoForm";
+import { TodoList } from "./components/TodoList";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./components/ui/card";
+import { CheckSquare2 } from "lucide-react";
 
 function App() {
-  const { todos, loading, error, addTodo, toggleTodo, deleteTodo } = useTodos()
+  const { todos, loading, error, addTodo, toggleTodo, deleteTodo } = useTodos();
 
   const handleAddTodo = async (title) => {
     try {
-      await addTodo(title)
+      await addTodo(title);
     } catch (err) {
-      console.error('Failed to add todo:', err)
+      console.error("Failed to add todo:", err);
     }
-  }
+  };
 
   const handleToggleTodo = async (id) => {
     try {
-      await toggleTodo(id)
+      await toggleTodo(id);
     } catch (err) {
-      console.error('Failed to toggle todo:', err)
+      console.error("Failed to toggle todo:", err);
     }
-  }
+  };
 
   const handleDeleteTodo = async (id) => {
     try {
-      await deleteTodo(id)
+      await deleteTodo(id);
     } catch (err) {
-      console.error('Failed to delete todo:', err)
+      console.error("Failed to delete todo:", err);
     }
-  }
+  };
 
-  const completedCount = todos.filter(t => t.completed).length
-  const totalCount = todos.length
+  console.log("todos", todos);
+
+  const completedCount = todos?.filter((t) => t.completed).length ?? 0;
+  const totalCount = todos?.length ?? 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 py-8 px-4">
@@ -50,16 +58,16 @@ function App() {
               {totalCount > 0 && ` • ${completedCount}/${totalCount} completed`}
             </CardDescription>
           </CardHeader>
-          
+
           <CardContent className="space-y-6">
             <TodoForm onAdd={handleAddTodo} disabled={loading} />
-            
+
             {error && (
               <div className="text-sm text-destructive text-center">
                 Last action failed. Please try again.
               </div>
             )}
-            
+
             <TodoList
               todos={todos}
               loading={loading}
@@ -75,7 +83,7 @@ function App() {
         </footer>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

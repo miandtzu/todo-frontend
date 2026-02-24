@@ -1,113 +1,116 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from "react";
 
-const API_BASE_URL = 'http://localhost:3000/todos'
+const API_BASE_URL = "http://localhost:3000/todos";
 
 export function useTodos() {
-  const [todos, setTodos] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [todos, setTodos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Fetch all todos
   const fetchTodos = useCallback(async () => {
     try {
-      setLoading(true)
-      setError(null)
-      const response = await fetch(API_BASE_URL)
-      
+      setLoading(true);
+      setError(null);
+      const response = await fetch(API_BASE_URL);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      const data = await response.json()
-      setTodos(data || [])
+
+      const data = await response.json();
+      setTodos(data.data ?? []);
     } catch (err) {
-      setError(err.message)
-      console.error('Error fetching todos:', err)
+      setError(err.message);
+      console.error("Error fetching todos:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   // Add a new todo
   const addTodo = useCallback(async (title) => {
     try {
-      setError(null)
+      setError(null);
       const response = await fetch(API_BASE_URL, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ title, completed: false }),
-      })
-      
+      });
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      const newTodo = await response.json()
-      setTodos(prev => [...prev, newTodo])
-      return newTodo
+
+      const newTodo = await response.json();
+      setTodos((prev) => [...prev, newTodo.data]);
+      return newTodo;
     } catch (err) {
-      setError(err.message)
-      console.error('Error adding todo:', err)
-      throw err
+      setError(err.message);
+      console.error("Error adding todo:", err);
+      throw err;
     }
-  }, [])
+  }, []);
 
   // Toggle todo completion status
-  const toggleTodo = useCallback(async (id) => {
-    const todo = todos.find(t => t.id === id)
-    if (!todo) return
+  const toggleTodo = useCallback(
+    async (id) => {
+      const todo = todos.find((t) => t.id === id);
+      if (!todo) return;
 
-    try {
-      setError(null)
-      const response = await fetch(`${API_BASE_URL}/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ completed: !todo.completed }),
-      })
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+      try {
+        setError(null);
+        const response = await fetch(`${API_BASE_URL}/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ completed: !todo.completed }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const updatedTodo = await response.json();
+        setTodos((prev) =>
+          prev.map((t) => (t.id === id ? updatedTodo.data : t)),
+        );
+      } catch (err) {
+        setError(err.message);
+        console.error("Error toggling todo:", err);
+        throw err;
       }
-      
-      const updatedTodo = await response.json()
-      setTodos(prev =>
-        prev.map(t => (t.id === id ? updatedTodo : t))
-      )
-    } catch (err) {
-      setError(err.message)
-      console.error('Error toggling todo:', err)
-      throw err
-    }
-  }, [todos])
+    },
+    [todos],
+  );
 
   // Delete a todo
   const deleteTodo = useCallback(async (id) => {
     try {
-      setError(null)
+      setError(null);
       const response = await fetch(`${API_BASE_URL}/${id}`, {
-        method: 'DELETE',
-      })
-      
+        method: "DELETE",
+      });
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      setTodos(prev => prev.filter(t => t.id !== id))
+
+      setTodos((prev) => prev.filter((t) => t.id !== id));
     } catch (err) {
-      setError(err.message)
-      console.error('Error deleting todo:', err)
-      throw err
+      setError(err.message);
+      console.error("Error deleting todo:", err);
+      throw err;
     }
-  }, [])
+  }, []);
 
   // Load todos on mount
   useEffect(() => {
-    fetchTodos()
-  }, [fetchTodos])
+    fetchTodos();
+  }, [fetchTodos]);
 
   return {
     todos,
@@ -117,5 +120,5 @@ export function useTodos() {
     toggleTodo,
     deleteTodo,
     refetch: fetchTodos,
-  }
+  };
 }
